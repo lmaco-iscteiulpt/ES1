@@ -6,10 +6,13 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,6 +32,8 @@ public class GUI {
 	private JPanel panelManual;
 	private JTable tblManual;
 	private JScrollPane scrollManual;
+	private ArrayList<Regra> listaRegrasManual;
+	private Object[][] valoresManual;
 	private JTextField textFalsosPositivosManual;
 	private JTextField textFalsosNegativosManual;
 
@@ -45,7 +50,7 @@ public class GUI {
 		frame.setTitle("Configuração manual do filtro anti-spam");
 		createPanel1();
 		createPanelManual();
-		createPanel3();
+		createPanelAutomatico();
 
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setSize(800, 600);
@@ -58,7 +63,7 @@ public class GUI {
 	private void createPanel1() {
 		JPanel panel1 = new JPanel(new GridLayout(3, 1));
 
-		// Ligra Regras
+		// Linha Regras
 		JPanel panelRegras = new JPanel(new FlowLayout());
 		panelRegras.add(new JLabel("Ficheiro regras: "));
 		textFicheiroRegras = new JTextField(30);
@@ -105,7 +110,7 @@ public class GUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			
+				carregarRegras();
 			}
 		});
 		panelBotoes.add(btnCarregar);
@@ -116,7 +121,7 @@ public class GUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-		
+				avaliaFiltroManual();
 			}
 		});
 		panelBotoes.add(btnAvaliar);
@@ -126,7 +131,7 @@ public class GUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-			
+				guardarRegrasManual();
 			}
 
 		});
@@ -148,7 +153,7 @@ public class GUI {
 		frame.add(panelManual);
 	}
 
-	private void createPanel3() {
+	private void createPanelAutomatico() {
 		panelAutomatico = new JPanel(new BorderLayout());
 
 		JLabel titulo = new JLabel("Configuração Automática");
@@ -197,7 +202,51 @@ public class GUI {
 		frame.add(panelAutomatico);
 	}
 
+	public void carregarRegras() {
+		String diretoria = textFicheiroRegras.getText();
+		File file = new File(diretoria);
+		if(file.exists()) {
+			listaRegrasManual = IO.leRegras(file);
+			System.out.println("Carreguei " + listaRegrasManual.size() + " regras");
+			valoresManual = new Object[listaRegrasManual.size()][colunas.length];
+			for (int linha = 0; linha < listaRegrasManual.size(); linha++) {
+				valoresManual[linha][0] = listaRegrasManual.get(linha).getPalavra();
+				valoresManual[linha][1] = new Double(listaRegrasManual.get(linha).getPeso());
+			}
 
+			panelManual.remove(scrollManual);
+
+			tblManual = new JTable(valoresManual, colunas);
+			scrollManual = new JScrollPane(tblManual);
+			panelManual.add(scrollManual, BorderLayout.CENTER);
+
+			frame.validate();
+		}
+	}
+		
+	private void guardaFicheiroDaMatrizNaLista() {
+		for (int linha = 0; linha < valoresManual.length; linha++) {
+			if(valoresManual[linha][1] instanceof Double) {
+				listaRegrasManual.get(linha).setPeso((Double)valoresManual[linha][1]);
+			}
+			else if(valoresManual[linha][1] instanceof String) {
+				double d = Double.valueOf((String)valoresManual[linha][1]);
+				listaRegrasManual.get(linha).setPeso(d);
+			}
+		}
+	}
+		
+	public void guardarRegrasManual() {
+		String diretoria = JOptionPane.showInputDialog("Diretoria:");
+		guardaFicheiroDaMatrizNaLista();
+		IO.escreveRegras(listaRegrasManual, diretoria);
+	}
+	
+		public void avaliaFiltroManual() {
+			
+		}
+		
+		
 	public static void main(String[] args) {
 		GUI gui = new GUI();
 		gui.open();
