@@ -38,4 +38,91 @@ public class IO {
 			e.printStackTrace();
 		}
 	}
+	
+	public static ArrayList<Mail> leMails(File file, boolean isSpam) {
+		ArrayList<Mail> listaMails = new ArrayList<>();
+		
+		try {
+			Scanner scanner = new Scanner(file);
+			
+			while(scanner.hasNextLine()) {
+				String linha = scanner.nextLine();
+				String[] palavras = linha.split("\\s");
+				
+//				System.out.println("Linha: " + linha);
+//				for (int i = 0; i < palavras.length; i++) {
+//					System.out.println(i + " -> " + palavras[i]);
+//				}
+				
+				ArrayList<String> listaConteudo = new ArrayList<String>();
+				for (int i = 1; i < palavras.length; i++) {
+					listaConteudo.add(palavras[i]);
+				}
+				
+				Mail mail = new Mail(isSpam, palavras[0], listaConteudo);
+				listaMails.add(mail);
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return listaMails;
+	}
+	
+	public static ArrayList<Double> lePesosAutomaticos(File file, File filePesos) {
+		
+		
+		try {
+			double min = 0;
+			int indiceLinhaMin = 0;
+			int indiceLinha = 0;
+			boolean primeiroValor = true;
+			Scanner scanner = new Scanner(file);
+			while(scanner.hasNextLine()) {
+				String linha = scanner.nextLine();
+				String[] valores = linha.split(" ");
+				double valor = Double.valueOf(valores[0]);
+				if(primeiroValor) {
+					primeiroValor = false;
+					min = valor;
+					indiceLinhaMin = 0;
+				} else {
+					if(valor < min) {
+						min = valor;
+						indiceLinhaMin = indiceLinha;
+					}
+				}
+				
+				indiceLinha++;
+			}
+			scanner.close();
+			
+			
+			ArrayList<Double> listaPesos = new ArrayList<Double>();
+			indiceLinha = 0;
+			scanner = new Scanner(filePesos);
+			while(scanner.hasNextLine()) {
+				String linha = scanner.nextLine();
+				
+				if(indiceLinha == indiceLinhaMin) {
+					String[] valores = linha.split(" ");
+					for (String valor : valores) {
+						double peso = Double.valueOf(valor);
+						listaPesos.add(peso);
+					}
+				}
+				indiceLinha++;
+			}
+			scanner.close();
+			
+			return listaPesos;
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
 }
