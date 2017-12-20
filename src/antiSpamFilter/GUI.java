@@ -22,6 +22,8 @@ import javax.swing.WindowConstants;
 public class GUI {
 
 	private JFrame frame; //janela
+	
+	private static final double THRESHOLD = 5.0;
 
 	private Object[] colunas = new Object[]{"Regra", "Peso"};
 
@@ -243,7 +245,36 @@ public class GUI {
 	}
 	
 		public void avaliaFiltroManual() {
-			
+			File fileSpam = new File(textFicheiroSpam.getText());
+			File fileHam = new File(textFicheiroHam.getText());
+
+			if(fileSpam.exists() && fileHam.exists()) {
+
+				guardaFicheiroDaMatrizNaLista();
+
+				int falsosPositivos = 0;
+				ArrayList<Mail> listaMailsHam = IO.leMails(fileHam, true);
+				System.out.println("Carreguei " + listaMailsHam.size() + " mails de ham.");
+				for (Mail mail : listaMailsHam) {
+					double media = mail.somaPesos(listaRegrasManual);
+					if(media > THRESHOLD) {
+						falsosPositivos++;
+					}
+				}
+				textFalsosPositivosManual.setText(falsosPositivos + "");
+
+
+				int falsosNegativos = 0;
+				ArrayList<Mail> listaMailsSpam = IO.leMails(fileSpam, false);
+				System.out.println("Carreguei " + listaMailsSpam.size() + " mails de spam.");
+				for (Mail mail : listaMailsSpam) {
+					double media = mail.somaPesos(listaRegrasManual);
+					if(media <= THRESHOLD) {
+						falsosNegativos++;
+					}
+				}
+				textFalsosNegativosManual.setText(falsosNegativos + "");
+			}
 		}
 		
 		
