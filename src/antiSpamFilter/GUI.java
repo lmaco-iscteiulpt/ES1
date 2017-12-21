@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -24,6 +25,8 @@ public class GUI {
 	private JFrame frame; //janela
 	
 	private static final double THRESHOLD = 5.0;
+	private static final String FICHEIRO_RF = "experimentBaseDirectory/referenceFronts/AntiSpamFilterProblem.NSGAII.rf";
+	private static final String FICHEIRO_RS = "experimentBaseDirectory/referenceFronts/AntiSpamFilterProblem.NSGAII.rs";
 
 	private Object[] colunas = new Object[]{"Regra", "Peso"};
 
@@ -44,6 +47,8 @@ public class GUI {
 	private JScrollPane scrollAutomatico;
 	private JTextField textFalsosPositivosAutomatico;
 	private JTextField textFalsosNegativosAutomatico;
+	private ArrayList<Regra> listaRegrasAutomatico;
+	private Object[][] valoresAutomatico;
 
 	public GUI(){
 		frame = new JFrame();
@@ -174,7 +179,7 @@ public class GUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				avaliaFiltroAutomatico();
 			}
 		});
 		panelBotoes.add(btnAvaliar);
@@ -183,7 +188,7 @@ public class GUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				guardarRegrasAutomatico();
 			}
 		});
 		panelBotoes.add(btnGuardar);
@@ -226,24 +231,17 @@ public class GUI {
 		}
 	}
 		
-	private void guardaFicheiroDaMatrizNaLista() {
-		for (int linha = 0; linha < valoresManual.length; linha++) {
-			if(valoresManual[linha][1] instanceof Double) {
-				listaRegrasManual.get(linha).setPeso((Double)valoresManual[linha][1]);
-			}
-			else if(valoresManual[linha][1] instanceof String) {
-				double d = Double.valueOf((String)valoresManual[linha][1]);
-				listaRegrasManual.get(linha).setPeso(d);
-			}
-		}
-	}
-		
 	public void guardarRegrasManual() {
 		String diretoria = JOptionPane.showInputDialog("Diretoria:");
 		guardaFicheiroDaMatrizNaLista();
 		IO.escreveRegras(listaRegrasManual, diretoria);
 	}
 	
+	public void guardarRegrasAutomatico() {
+		String diretoria = JOptionPane.showInputDialog("Diretoria:");
+		IO.escreveRegras(listaRegrasAutomatico, diretoria);
+	}
+			
 		public void avaliaFiltroManual() {
 			File fileSpam = new File(textFicheiroSpam.getText());
 			File fileHam = new File(textFicheiroHam.getText());
@@ -277,6 +275,91 @@ public class GUI {
 			}
 		}
 		
+		public void avaliaFiltroAutomatico() {
+			try {
+
+				String diretoria = textFicheiroRegras.getText();
+				File file = new File(diretoria);
+				if(file.exists()) {
+					listaRegrasAutomatico = IO.leRegras(file);
+
+					AntiSpamFilterAutomaticConfiguration.main(null);
+
+					File fileRF = new File(FICHEIRO_RF);
+					File filePesos = new File(FICHEIRO_RS);
+					
+					
+
+					ArrayList<Double> listaPesos = IO.lePesosAutomaticos(fileRF, filePesos);
+
+					for (int i = 0; i < colunas.length; i++) {
+						listaRegrasAutomatico.get(i).setPeso(listaPesos.get(i));
+					}
+
+					System.out.println("Carreguei " + listaRegrasAutomatico.size() + " regras");
+					valoresAutomatico = new Object[listaRegrasAutomatico.size()][colunas.length];
+					for (int linha = 0; linha < listaRegrasAutomatico.size(); linha++) {
+						valoresAutomatico[linha][0] = listaRegrasAutomatico.get(linha).getPalavra();
+						valoresAutomatico[linha][1] = new Double(listaRegrasAutomatico.get(linha).getPeso());
+					}
+
+					panelAutomatico.remove(scrollAutomatico);
+
+					tblAutomatico = new JTable(valoresAutomatico, colunas);
+					scrollAutomatico = new JScrollPane(tblAutomatico);
+					panelAutomatico.add(scrollAutomatico, BorderLayout.CENTER);
+
+					frame.validate();
+				}
+				
+				
+				File fileSpam = new File(textFicheiroSpam.getText());
+				File fileHam = new File(textFicheiroHam.getText());
+
+				if(fileSpam.exists() && fileHam.exists()) {
+
+
+					int falsosPositivos = 0;
+					ArrayList<Mail> listaMailsHam = IO.leMails(fileHam, true);
+					System.out.println("Carreguei " + listaMailsHam.size() + " mails de ham.");
+					for (Mail mail : listaMailsHam) {
+						double media = mail.somaPesos(listaRegrasAutomatico);
+						if(media > THRESHOLD) {
+							falsosPositivos++;
+						}
+					}
+					textFalsosPositivosAutomatico.setText(falsosPositivos + "");
+
+
+					int falsosNegativos = 0;
+					ArrayList<Mail> listaMailsSpam = IO.leMails(fileSpam, false);
+					System.out.println("Carreguei " + listaMailsSpam.size() + " mails de spam.");
+					for (Mail mail : listaMailsSpam) {
+						double media = mail.somaPesos(listaRegrasAutomatico);
+						if(media <= THRESHOLD) {
+							falsosNegativos++;
+						}
+					}
+					textFalsosNegativosAutomatico.setText(falsosNegativos + "");
+				}
+
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		private void guardaFicheiroDaMatrizNaLista() {
+			for (int linha = 0; linha < valoresManual.length; linha++) {
+				if(valoresManual[linha][1] instanceof Double) {
+					listaRegrasManual.get(linha).setPeso((Double)valoresManual[linha][1]);
+				}
+				else if(valoresManual[linha][1] instanceof String) {
+					double d = Double.valueOf((String)valoresManual[linha][1]);
+					listaRegrasManual.get(linha).setPeso(d);
+				}
+			}
+		}
 		
 	public static void main(String[] args) {
 		GUI gui = new GUI();
