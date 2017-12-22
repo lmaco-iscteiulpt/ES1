@@ -15,20 +15,31 @@ public class IO {
 	 */
 	public static ArrayList<Regra> leRegras(File file) {
 		ArrayList<Regra> listaRegras = new ArrayList<>();
-		
+
 		try {
 			Scanner scanner = new Scanner(file);
-			
+
 			while(scanner.hasNextLine()) {
 				String linha = scanner.nextLine();
-				Regra regra = new Regra(linha);
-				listaRegras.add(regra);
+
+				String[] tokens = linha.split(" ");
+				if(tokens.length == 1) {
+					String palavra = tokens[0];
+					Regra regra = new Regra(palavra);
+					listaRegras.add(regra);
+				} else if(tokens.length == 2) {
+					String palavra = tokens[0];
+					double peso = Double.valueOf(tokens[1]);
+					Regra regra = new Regra(palavra, peso);
+					listaRegras.add(regra);
+
+				}
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		return listaRegras;
 	}
 	
