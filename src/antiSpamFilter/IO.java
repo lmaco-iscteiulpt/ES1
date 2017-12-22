@@ -8,6 +8,11 @@ import java.util.Scanner;
 
 public class IO {
 
+	/**
+	 * Devolve lista listaRegras
+	 * @param file
+	 * @return listaRegras
+	 */
 	public static ArrayList<Regra> leRegras(File file) {
 		ArrayList<Regra> listaRegras = new ArrayList<>();
 		
@@ -27,6 +32,12 @@ public class IO {
 		return listaRegras;
 	}
 	
+	/**
+	 * Altera lista listaRegras
+	 * @param listaRegras
+	 * @param diretoria
+	 */
+	
 	public static void escreveRegras(ArrayList<Regra> listaRegras, String diretoria) {
 		try {
 			PrintWriter printWriter = new PrintWriter(new File(diretoria));
@@ -38,6 +49,13 @@ public class IO {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Devolve lista listaMails
+	 * @param file
+	 * @param isSpam
+	 * @return listaRegras
+	 */
 	
 	public static ArrayList<Mail> leMails(File file, boolean isSpam) {
 		ArrayList<Mail> listaMails = new ArrayList<>();
@@ -69,6 +87,13 @@ public class IO {
 		
 		return listaMails;
 	}
+	
+	/**
+	 * Devolve lista listaPesos
+	 * @param file
+	 * @param filePesos
+	 * @return listaPesos
+	 */
 	
 	public static ArrayList<Double> lePesosAutomaticos(File file, File filePesos) {
 		
