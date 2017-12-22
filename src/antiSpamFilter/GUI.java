@@ -169,7 +169,6 @@ public class GUI {
 		JPanel panelRegras = new JPanel(new FlowLayout());
 		panelRegras.add(new JLabel("Ficheiro regras: "));
 		textFicheiroRegras = new JTextField(30);
-		textFicheiroRegras.setText("C:\\Users\\ligia\\git\\ES1-2017-IC2-88\\rules.cf");
 		panelRegras.add(textFicheiroRegras);
 		panel1.add(panelRegras);
 
@@ -177,7 +176,6 @@ public class GUI {
 		JPanel panelHam = new JPanel(new FlowLayout());
 		panelHam.add(new JLabel("Ficheiro Ham:     "));
 		textFicheiroHam = new JTextField(30);
-		textFicheiroHam.setText("C:\\Users\\ligia\\git\\ES1-2017-IC2-88\\ham.log");
 		panelHam.add(textFicheiroHam);
 		panel1.add(panelHam);
 
@@ -185,7 +183,6 @@ public class GUI {
 		JPanel panelSpam = new JPanel(new FlowLayout());
 		panelSpam.add(new JLabel("Ficheiro Spam:    "));
 		textFicheiroSpam = new JTextField(30);
-		textFicheiroSpam.setText("C:\\Users\\ligia\\git\\ES1-2017-IC2-88\\spam.log");
 		panelSpam.add(textFicheiroSpam);
 		panel1.add(panelSpam);
 
@@ -312,10 +309,14 @@ public class GUI {
 
 		frame.add(panelAutomatico);
 	}
+<<<<<<< HEAD
 
 	/**
 	 * Carrega ficheiro das regras
 	 */
+=======
+	
+>>>>>>> branch 'master' of https://github.com/lmaco-iscteiulpt/ES1-2017-IC2-88.git
 	public void carregarRegras() {
 		String diretoria = textFicheiroRegras.getText();
 		File file = new File(diretoria);
@@ -493,4 +494,3 @@ public class GUI {
 	}
 
 }
-
