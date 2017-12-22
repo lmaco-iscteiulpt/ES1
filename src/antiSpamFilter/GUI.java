@@ -309,14 +309,7 @@ public class GUI {
 
 		frame.add(panelAutomatico);
 	}
-<<<<<<< HEAD
 
-	/**
-	 * Carrega ficheiro das regras
-	 */
-=======
-	
->>>>>>> branch 'master' of https://github.com/lmaco-iscteiulpt/ES1-2017-IC2-88.git
 	public void carregarRegras() {
 		String diretoria = textFicheiroRegras.getText();
 		File file = new File(diretoria);
