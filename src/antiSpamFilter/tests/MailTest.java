@@ -8,6 +8,7 @@ import antiSpamFilter.Mail;
 import antiSpamFilter.Regra;
 import junit.framework.Assert;
 
+@SuppressWarnings("deprecation")
 class MailTest {
 	
 	@Test
