@@ -1,11 +1,9 @@
 package antiSpamFilter.tests;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.ArrayList;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import antiSpamFilter.Mail;
 import antiSpamFilter.Regra;
